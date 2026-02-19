@@ -161,10 +161,17 @@ if vim.lsp.inlay_hint then
   Snacks.toggle.inlay_hints():map("<leader>uh")
 end
 
--- lazygit
-if vim.fn.executable("lazygit") == 1 then
-  map("n", "<leader>gg", function() Snacks.lazygit( { cwd = LazyVim.root.git() }) end, { desc = "Lazygit (Root Dir)" })
-  map("n", "<leader>gG", function() Snacks.lazygit() end, { desc = "Lazygit (cwd)" })
+-- jjui
+if vim.fn.executable("jj") == 1 then
+  local function jjui(opts)
+    local cwd = opts.cwd or vim.uv.cwd()
+    if not vim.fs.find(".jj", { path = cwd, upward = true })[1] then
+      return Snacks.notify.warn("Not a jj repository", { title = "jjui" })
+    end
+    Snacks.terminal("jjui", vim.tbl_extend("force", { win = { border = "rounded" } }, opts))
+  end
+  map("n", "<leader>jj", function() jjui({ cwd = LazyVim.root.git() }) end, { desc = "Jujutsu UI (Root Dir)" })
+  map("n", "<leader>jJ", function() jjui({}) end, { desc = "Jujutsu UI (cwd)" })
 end
 
 map("n", "<leader>gL", function() Snacks.picker.git_log() end, { desc = "Git Log (cwd)" })
