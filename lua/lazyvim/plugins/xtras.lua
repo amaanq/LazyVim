@@ -37,7 +37,6 @@ local extras = {
   "lazyvim.plugins.extras.linting.eslint",
   "lazyvim.plugins.extras.ui.treesitter-context",
   "lazyvim.plugins.extras.util.dot",
-  "lazyvim.plugins.extras.util.gh",
   "lazyvim.plugins.extras.util.jjui",
   "lazyvim.plugins.extras.util.mini-hipatterns",
   "lazyvim.plugins.extras.util.octo",
