@@ -16,7 +16,6 @@ return {
   {
     "neovim/nvim-lspconfig",
     opts = {
-      -- make sure mason installs the server
       servers = {
         yamlls = {
           -- Have to add this for yamlls to understand that we support line folding

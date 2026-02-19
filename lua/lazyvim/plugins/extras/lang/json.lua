@@ -23,7 +23,6 @@ return {
   {
     "neovim/nvim-lspconfig",
     opts = {
-      -- make sure mason installs the server
       servers = {
         jsonls = {
           -- lazy-load schemastore when needed

@@ -17,10 +17,6 @@ return {
       },
     },
   },
-  {
-    "mason-org/mason.nvim",
-    opts = { ensure_installed = { "shellcheck" } },
-  },
   -- add some stuff to treesitter
   {
     "nvim-treesitter/nvim-treesitter",
