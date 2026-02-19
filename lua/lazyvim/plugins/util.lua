@@ -50,7 +50,4 @@ return {
       { "<leader>qd", function() require("persistence").stop() end, desc = "Don't Save Current Session" },
     },
   },
-
-  -- library used by other plugins
-  { "nvim-lua/plenary.nvim", lazy = true },
 }

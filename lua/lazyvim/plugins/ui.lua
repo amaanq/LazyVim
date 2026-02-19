@@ -32,12 +32,6 @@ return {
         end,
         offsets = {
           {
-            filetype = "neo-tree",
-            text = "Neo-tree",
-            highlight = "Directory",
-            text_align = "left",
-          },
-          {
             filetype = "snacks_layout_box",
           },
         },
@@ -124,12 +118,6 @@ return {
             },
             -- stylua: ignore
             {
-              function() return "  " .. require("dap").status() end,
-              cond = function() return package.loaded["dap"] and require("dap").status() ~= "" end,
-              color = function() return { fg = Snacks.util.color("Debug") } end,
-            },
-            -- stylua: ignore
-            {
               require("lazy.status").updates,
               cond = require("lazy.status").has_updates,
               color = function() return { fg = Snacks.util.color("Special") } end,
@@ -163,7 +151,7 @@ return {
             end,
           },
         },
-        extensions = { "neo-tree", "lazy", "fzf" },
+        extensions = { "lazy" },
       }
 
       -- do not add trouble symbols if aerial is enabled
@@ -191,36 +179,129 @@ return {
   },
 
   -- Highly experimental plugin that completely replaces the UI for messages, cmdline and the popupmenu.
+  { "MunifTanjim/nui.nvim", lazy = true },
+
   {
     "folke/noice.nvim",
     event = "VeryLazy",
-    opts = {
-      lsp = {
+    opts = function(_, opts)
+      opts.lsp = {
         override = {
           ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
           ["vim.lsp.util.stylize_markdown"] = true,
           ["cmp.entry.get_documentation"] = true,
         },
-      },
-      routes = {
-        {
-          filter = {
-            event = "msg_show",
-            any = {
-              { find = "%d+L, %d+B" },
-              { find = "; after #%d+" },
-              { find = "; before #%d+" },
-            },
+      }
+      opts.routes = opts.routes or {}
+      table.insert(opts.routes, {
+        filter = {
+          event = "msg_show",
+          any = {
+            { find = "%d+L, %d+B" },
+            { find = "; after #%d+" },
+            { find = "; before #%d+" },
           },
-          view = "mini",
         },
-      },
-      presets = {
+        view = "mini",
+      })
+      table.insert(opts.routes, {
+        filter = {
+          event = "notify",
+          find = "No information available",
+        },
+        opts = { skip = true },
+      })
+      local focused = true
+      vim.api.nvim_create_autocmd("FocusGained", {
+        callback = function()
+          focused = true
+        end,
+      })
+      vim.api.nvim_create_autocmd("FocusLost", {
+        callback = function()
+          focused = false
+        end,
+      })
+      table.insert(opts.routes, 1, {
+        filter = {
+          ["not"] = {
+            event = "lsp",
+            kind = "progress",
+          },
+          event = "msg_show",
+          find = "%d+L, %d+B",
+          cond = function()
+            return not focused and false
+          end,
+        },
+        view = "mini",
+        opts = { stop = false, replace = true },
+      })
+
+      opts.commands = {
+        all = {
+          -- options for the message history that you get with `:Noice`
+          view = "split",
+          opts = { enter = true, format = "details" },
+          filter = {},
+        },
+      }
+
+      opts.views = {
+        mini = {
+          win_options = {
+            winblend = 0,
+            winhighlight = { Normal = "Pmenu", FloatBorder = "Pmenu" },
+          },
+        },
+        cmdline_popup = {
+          position = {
+            row = 5,
+            col = "50%",
+          },
+          size = {
+            width = 60,
+            height = "auto",
+          },
+        },
+        popupmenu = {
+          relative = "editor",
+          position = {
+            row = 8,
+            col = "50%",
+          },
+          size = {
+            width = 60,
+            height = 10,
+          },
+          border = {
+            style = "rounded",
+            padding = { 0, 1 },
+          },
+          win_options = {
+            winhighlight = { Normal = "Normal", FloatBorder = "DiagnosticInfo" },
+          },
+        },
+      }
+
+      opts.presets = {
         bottom_search = true,
         command_palette = true,
         long_message_to_split = true,
-      },
-    },
+        inc_rename = true,
+        cmdline_output_to_split = false,
+        lsp_doc_border = true,
+      }
+
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "markdown",
+        callback = function(event)
+          vim.schedule(function()
+            require("noice.text.markdown").keys(event.buf)
+          end)
+        end,
+      })
+    end,
     -- stylua: ignore
     keys = {
       { "<leader>sn", "", desc = "+noice"},
@@ -264,9 +345,6 @@ return {
       end
     end,
   },
-
-  -- ui components
-  { "MunifTanjim/nui.nvim", lazy = true },
 
   {
     "snacks.nvim",
