@@ -1,70 +1,50 @@
--- Some extras need to be loaded before others
+-- All extras are always enabled in this fork.
+-- Priority determines load order (lower = earlier).
 local prios = {
-  ["lazyvim.plugins.extras.test.core"] = 1,
-  ["lazyvim.plugins.extras.dap.core"] = 1,
-  ["lazyvim.plugins.extras.coding.nvim-cmp"] = 2,
-  ["lazyvim.plugins.extras.editor.neo-tree"] = 2,
-  ["lazyvim.plugins.extras.ui.edgy"] = 3,
   ["lazyvim.plugins.extras.ai.copilot-native"] = 4,
   ["lazyvim.plugins.extras.coding.blink"] = 5,
   ["lazyvim.plugins.extras.lang.typescript"] = 5,
-  ["lazyvim.plugins.extras.formatting.prettier"] = 10,
-  -- default core extra priority is 20
-  -- default priority is 50
-  ["lazyvim.plugins.extras.editor.aerial"] = 100,
-  ["lazyvim.plugins.extras.editor.outline"] = 100,
-  ["lazyvim.plugins.extras.ui.alpha"] = 19,
-  ["lazyvim.plugins.extras.ui.dashboard-nvim"] = 19,
-  ["lazyvim.plugins.extras.ui.mini-starter"] = 19,
 }
 
-if vim.g.xtras_prios then
-  prios = vim.tbl_deep_extend("force", prios, vim.g.xtras_prios or {})
-end
-
-local extras = {} ---@type string[]
-local defaults = LazyVim.config.get_defaults()
-
-local changed = false
-local updated = {} ---@type string[]
-
--- Add extras from LazyExtras that are not disabled
-for _, extra in ipairs(LazyVim.config.json.data.extras) do
-  if LazyVim.plugin.renamed_extras[extra] then
-    extra = LazyVim.plugin.renamed_extras[extra]
-    changed = true
-  end
-  if LazyVim.plugin.deprecated_extras[extra] then
-    changed = true
-  else
-    updated[#updated + 1] = extra
-    local def = defaults[extra]
-    if not (def and def.enabled == false) then
-      extras[#extras + 1] = extra
-    end
-  end
-end
-
-if changed then
-  LazyVim.config.json.data.extras = updated
-  LazyVim.json.save()
-end
-
--- Add default extras
-for name, extra in pairs(defaults) do
-  if extra.enabled then
-    prios[name] = prios[name] or 20
-    extras[#extras + 1] = name
-  end
-end
-
----@type string[]
-extras = LazyVim.dedup(extras)
+local extras = {
+  "lazyvim.plugins.extras.ai.claudecode",
+  "lazyvim.plugins.extras.ai.copilot-native",
+  "lazyvim.plugins.extras.coding.blink",
+  "lazyvim.plugins.extras.coding.yanky",
+  "lazyvim.plugins.extras.editor.dial",
+  "lazyvim.plugins.extras.editor.inc-rename",
+  "lazyvim.plugins.extras.editor.snacks_explorer",
+  "lazyvim.plugins.extras.editor.snacks_picker",
+  "lazyvim.plugins.extras.lang.clangd",
+  "lazyvim.plugins.extras.lang.cmake",
+  "lazyvim.plugins.extras.lang.elixir",
+  "lazyvim.plugins.extras.lang.git",
+  "lazyvim.plugins.extras.lang.go",
+  "lazyvim.plugins.extras.lang.java",
+  "lazyvim.plugins.extras.lang.json",
+  "lazyvim.plugins.extras.lang.kotlin",
+  "lazyvim.plugins.extras.lang.markdown",
+  "lazyvim.plugins.extras.lang.nix",
+  "lazyvim.plugins.extras.lang.nushell",
+  "lazyvim.plugins.extras.lang.python",
+  "lazyvim.plugins.extras.lang.rust",
+  "lazyvim.plugins.extras.lang.svelte",
+  "lazyvim.plugins.extras.lang.tailwind",
+  "lazyvim.plugins.extras.lang.toml",
+  "lazyvim.plugins.extras.lang.typescript",
+  "lazyvim.plugins.extras.lang.yaml",
+  "lazyvim.plugins.extras.lang.zig",
+  "lazyvim.plugins.extras.linting.eslint",
+  "lazyvim.plugins.extras.ui.treesitter-context",
+  "lazyvim.plugins.extras.util.dot",
+  "lazyvim.plugins.extras.util.gh",
+  "lazyvim.plugins.extras.util.jjui",
+  "lazyvim.plugins.extras.util.mini-hipatterns",
+  "lazyvim.plugins.extras.util.octo",
+  "lazyvim.plugins.extras.util.startuptime",
+}
 
 LazyVim.plugin.save_core()
-if vim.g.vscode then
-  table.insert(extras, 1, "lazyvim.plugins.extras.vscode")
-end
 
 table.sort(extras, function(a, b)
   local pa = prios[a] or 50
