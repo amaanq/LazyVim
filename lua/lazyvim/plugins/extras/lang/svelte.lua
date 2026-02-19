@@ -31,6 +31,11 @@ return {
               desc = "Organize Imports",
             },
           },
+          capabilities = {
+            workspace = {
+              didChangeWatchedFiles = vim.fn.has("nvim-0.10") == 0 and { dynamicRegistration = true },
+            },
+          },
         },
       },
     },
@@ -43,7 +48,7 @@ return {
       LazyVim.extend(opts.servers.vtsls, "settings.vtsls.tsserver.globalPlugins", {
         {
           name = "typescript-svelte-plugin",
-          location = LazyVim.get_pkg_path("svelte-language-server", "/node_modules/typescript-svelte-plugin"),
+          location = vim.fn.fnamemodify(vim.fn.exepath("svelteserver"), ":h:h") .. "/node_modules/typescript-svelte-plugin",
           enableForWorkspaceTypeScriptVersions = true,
         },
       })
