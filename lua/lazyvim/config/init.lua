@@ -359,24 +359,14 @@ function M.get_defaults()
   local checks = {
     picker = {
       { name = "snacks", extra = "editor.snacks_picker" },
-      { name = "fzf", extra = "editor.fzf" },
-      { name = "telescope", extra = "editor.telescope" },
     },
     cmp = {
       { name = "blink.cmp", extra = "coding.blink" },
-      { name = "nvim-cmp", extra = "coding.nvim-cmp" },
     },
     explorer = {
       { name = "snacks", extra = "editor.snacks_explorer" },
-      { name = "neo-tree", extra = "editor.neo-tree" },
     },
   }
-
-  -- existing installs keep their defaults
-  if (LazyVim.config.json.data.install_version or 7) < 8 then
-    table.insert(checks.picker, 1, table.remove(checks.picker, 2))
-    table.insert(checks.explorer, 1, table.remove(checks.explorer, 2))
-  end
 
   default_extras = {}
   for name, check in pairs(checks) do
