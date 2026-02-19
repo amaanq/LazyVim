@@ -40,20 +40,6 @@ return {
     },
   },
   {
-    "mason-org/mason.nvim",
-    opts = { ensure_installed = { "markdownlint-cli2", "markdown-toc" } },
-  },
-  {
-    "nvimtools/none-ls.nvim",
-    optional = true,
-    opts = function(_, opts)
-      local nls = require("null-ls")
-      opts.sources = vim.list_extend(opts.sources or {}, {
-        nls.builtins.diagnostics.markdownlint_cli2,
-      })
-    end,
-  },
-  {
     "mfussenegger/nvim-lint",
     optional = true,
     opts = {

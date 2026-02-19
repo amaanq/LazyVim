@@ -36,38 +36,11 @@ return {
     opts = { ensure_installed = { "java" } },
   },
 
-  -- Ensure java debugger and test packages are installed.
-  {
-    "mfussenegger/nvim-dap",
-    optional = true,
-    opts = function()
-      -- Simple configuration to attach to remote java debug process
-      -- Taken directly from https://github.com/mfussenegger/nvim-dap/wiki/Java
-      local dap = require("dap")
-      dap.configurations.java = {
-        {
-          type = "java",
-          request = "attach",
-          name = "Debug (Attach) - Remote",
-          hostName = "127.0.0.1",
-          port = 5005,
-        },
-      }
-    end,
-    dependencies = {
-      {
-        "mason-org/mason.nvim",
-        opts = { ensure_installed = { "java-debug-adapter", "java-test" } },
-      },
-    },
-  },
-
-  -- Configure nvim-lspconfig to install the server automatically via mason, but
-  -- defer actually starting it to our configuration of nvim-jtdls below.
+  -- Configure nvim-lspconfig for jdtls, but defer actually starting it
+  -- to our configuration of nvim-jdtls below.
   {
     "neovim/nvim-lspconfig",
     opts = {
-      -- make sure mason installs the server
       servers = {
         jdtls = {},
       },
@@ -86,10 +59,6 @@ return {
     ft = java_filetypes,
     opts = function()
       local cmd = { vim.fn.exepath("jdtls") }
-      if LazyVim.has("mason.nvim") then
-        local lombok_jar = vim.fn.expand("$MASON/share/jdtls/lombok.jar")
-        table.insert(cmd, string.format("--jvm-arg=-javaagent:%s", lombok_jar))
-      end
       return {
         root_dir = function(path)
           return vim.fs.root(path, vim.lsp.config.jdtls.root_markers)
@@ -147,16 +116,6 @@ return {
       -- Find the extra bundles that should be passed on the jdtls command-line
       -- if nvim-dap is enabled with java debug/test.
       local bundles = {} ---@type string[]
-      if LazyVim.has("mason.nvim") then
-        local mason_registry = require("mason-registry")
-        if opts.dap and LazyVim.has("nvim-dap") and mason_registry.is_installed("java-debug-adapter") then
-          bundles = vim.fn.glob("$MASON/share/java-debug-adapter/com.microsoft.java.debug.plugin-*jar", false, true)
-          -- java-test also depends on java-debug-adapter.
-          if opts.test and mason_registry.is_installed("java-test") then
-            vim.list_extend(bundles, vim.fn.glob("$MASON/share/java-test/*.jar", false, true))
-          end
-        end
-      end
       local function attach_jdtls()
         local fname = vim.api.nvim_buf_get_name(0)
 
@@ -168,10 +127,7 @@ return {
             bundles = bundles,
           },
           settings = opts.settings,
-          -- enable CMP capabilities
-          capabilities = LazyVim.has("blink.cmp") and require("blink.cmp").get_lsp_capabilities() or LazyVim.has(
-            "cmp-nvim-lsp"
-          ) and require("cmp_nvim_lsp").default_capabilities() or nil,
+          capabilities = LazyVim.has("blink.cmp") and require("blink.cmp").get_lsp_capabilities() or nil,
         }, opts.jdtls)
 
         -- Existing server will be reused if the root_dir matches.
@@ -229,48 +185,6 @@ return {
                 },
               },
             })
-
-            if LazyVim.has("mason.nvim") then
-              local mason_registry = require("mason-registry")
-              if opts.dap and LazyVim.has("nvim-dap") and mason_registry.is_installed("java-debug-adapter") then
-                -- custom init for Java debugger
-                require("jdtls").setup_dap(opts.dap)
-                if opts.dap_main then
-                  require("jdtls.dap").setup_dap_main_class_configs(opts.dap_main)
-                end
-
-                -- Java Test require Java debugger to work
-                if opts.test and mason_registry.is_installed("java-test") then
-                  -- custom keymaps for Java test runner (not yet compatible with neotest)
-                  wk.add({
-                    {
-                      mode = "n",
-                      buffer = args.buf,
-                      { "<leader>t", group = "test" },
-                      {
-                        "<leader>tt",
-                        function()
-                          require("jdtls.dap").test_class({
-                            config_overrides = type(opts.test) ~= "boolean" and opts.test.config_overrides or nil,
-                          })
-                        end,
-                        desc = "Run All Test",
-                      },
-                      {
-                        "<leader>tr",
-                        function()
-                          require("jdtls.dap").test_nearest_method({
-                            config_overrides = type(opts.test) ~= "boolean" and opts.test.config_overrides or nil,
-                          })
-                        end,
-                        desc = "Run Nearest Test",
-                      },
-                      { "<leader>tT", require("jdtls.dap").pick_test, desc = "Run Test" },
-                    },
-                  })
-                end
-              end
-            end
 
             -- User can set additional keymaps in opts.on_attach
             if opts.on_attach then

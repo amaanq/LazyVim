@@ -41,19 +41,6 @@ return {
     opts = { ensure_installed = { "rust", "ron" } },
   },
 
-  -- Ensure Rust debugger is installed
-  {
-    "mason-org/mason.nvim",
-    optional = true,
-    opts = function(_, opts)
-      opts.ensure_installed = opts.ensure_installed or {}
-      vim.list_extend(opts.ensure_installed, { "codelldb" })
-      if diagnostics == "bacon-ls" then
-        vim.list_extend(opts.ensure_installed, { "bacon" })
-      end
-    end,
-  },
-
   {
     "mrcjkb/rustaceanvim",
     ft = { "rust" },
@@ -107,14 +94,6 @@ return {
       },
     },
     config = function(_, opts)
-      if LazyVim.has("mason.nvim") then
-        local codelldb = vim.fn.exepath("codelldb")
-        local codelldb_lib_ext = io.popen("uname"):read("*l") == "Linux" and ".so" or ".dylib"
-        local library_path = vim.fn.expand("$MASON/opt/lldb/lib/liblldb" .. codelldb_lib_ext)
-        opts.dap = {
-          adapter = require("rustaceanvim.config").get_codelldb_adapter(codelldb, library_path),
-        }
-      end
       vim.g.rustaceanvim = vim.tbl_deep_extend("keep", vim.g.rustaceanvim or {}, opts or {})
       if vim.fn.executable("rust-analyzer") == 0 then
         LazyVim.error(
@@ -138,13 +117,4 @@ return {
     },
   },
 
-  {
-    "nvim-neotest/neotest",
-    optional = true,
-    opts = {
-      adapters = {
-        ["rustaceanvim.neotest"] = {},
-      },
-    },
-  },
 }
