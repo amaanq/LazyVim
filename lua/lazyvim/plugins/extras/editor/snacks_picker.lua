@@ -29,7 +29,7 @@ return {
   desc = "Fast and modern file picker",
   recommended = true,
   {
-    "folke/snacks.nvim",
+    "amaanq/snacks.nvim",
     opts = {
       picker = {
         win = {
@@ -114,7 +114,7 @@ return {
     },
   },
   {
-    "folke/snacks.nvim",
+    "amaanq/snacks.nvim",
     opts = function(_, opts)
       if LazyVim.has("trouble.nvim") then
         return vim.tbl_deep_extend("force", opts or {}, {
@@ -169,7 +169,7 @@ return {
     },
   },
   {
-    "folke/snacks.nvim",
+    "amaanq/snacks.nvim",
     opts = function(_, opts)
       table.insert(opts.dashboard.preset.keys, 3, {
         icon = " ",
@@ -228,7 +228,7 @@ return {
     optional = true,
     specs = {
       {
-        "folke/snacks.nvim",
+        "amaanq/snacks.nvim",
         opts = {
           picker = {
             win = {

@@ -1,7 +1,7 @@
 return {
   desc = "Snacks File Explorer",
   recommended = true,
-  "folke/snacks.nvim",
+  "amaanq/snacks.nvim",
   opts = { explorer = {} },
   keys = {
     {
