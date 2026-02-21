@@ -71,11 +71,13 @@ return {
       { "<leader>fr", LazyVim.pick("oldfiles"), desc = "Recent" },
       { "<leader>fR", function() Snacks.picker.recent({ filter = { cwd = true }}) end, desc = "Recent (cwd)" },
       { "<leader>fp", function() Snacks.picker.projects() end, desc = "Projects" },
-      -- git
-      { "<leader>gd", function() Snacks.picker.git_diff() end, desc = "Git Diff (hunks)" },
-      { "<leader>gD", function() Snacks.picker.git_diff({ base = "origin", group = true }) end, desc = "Git Diff (origin)" },
-      { "<leader>gs", function() Snacks.picker.git_status() end, desc = "Git Status" },
+      -- git/jj (auto-detects jj repos)
+      { "<leader>gl", function() if vim.fs.root(0, ".jj") then Snacks.picker.jj_log() else Snacks.picker.git_log() end end, desc = "Log" },
+      { "<leader>gd", function() if vim.fs.root(0, ".jj") then Snacks.picker.jj_diff() else Snacks.picker.git_diff() end end, desc = "Diff (hunks)" },
+      { "<leader>gD", function() if vim.fs.root(0, ".jj") then Snacks.picker.jj_diff({ current_file = true }) else Snacks.picker.git_diff({ base = "origin", group = true }) end end, desc = "Diff (file/origin)" },
+      { "<leader>gs", function() if vim.fs.root(0, ".jj") then Snacks.picker.jj_status() else Snacks.picker.git_status() end end, desc = "Status" },
       { "<leader>gS", function() Snacks.picker.git_stash() end, desc = "Git Stash" },
+      { "<leader>gb", function() if vim.fs.root(0, ".jj") then Snacks.picker.jj_bookmarks() else Snacks.picker.git_branches() end end, desc = "Branches/Bookmarks" },
       { "<leader>gi", function() Snacks.picker.gh_issue() end, desc = "GitHub Issues (open)" },
       { "<leader>gI", function() Snacks.picker.gh_issue({ state = "all" }) end, desc = "GitHub Issues (all)" },
       { "<leader>gp", function() Snacks.picker.gh_pr() end, desc = "GitHub Pull Requests (open)" },
