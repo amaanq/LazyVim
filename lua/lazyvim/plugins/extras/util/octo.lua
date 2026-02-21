@@ -4,7 +4,7 @@ return {
   { import = "lazyvim.plugins.extras.lang.git" },
 
   {
-    "folke/snacks.nvim",
+    "amaanq/snacks.nvim",
     keys = { -- disable conflicting keymaps
       { "<leader>gi", false },
       { "<leader>gI", false },
