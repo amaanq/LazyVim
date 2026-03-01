@@ -174,14 +174,21 @@ if vim.fn.executable("jj") == 1 then
   map("n", "<leader>jJ", function() jjui({}) end, { desc = "Jujutsu UI (cwd)" })
 end
 
-map("n", "<leader>gL", function() Snacks.picker.git_log() end, { desc = "Git Log (cwd)" })
+local function is_jj() return vim.fs.root(0, ".jj") ~= nil end
+map("n", "<leader>gL", function()
+  if is_jj() then Snacks.picker.jj_log() else Snacks.picker.git_log() end
+end, { desc = "Log (cwd)" })
 map("n", "<leader>gb", function() Snacks.picker.git_log_line() end, { desc = "Git Blame Line" })
-map("n", "<leader>gf", function() Snacks.picker.git_log_file() end, { desc = "Git Current File History" })
-map("n", "<leader>gl", function() Snacks.picker.git_log({ cwd = LazyVim.root.git() }) end, { desc = "Git Log" })
-map({ "n", "x" }, "<leader>gB", function() Snacks.gitbrowse() end, { desc = "Git Browse (open)" })
+map("n", "<leader>gf", function()
+  if is_jj() then Snacks.picker.jj_diff({ current_file = true }) else Snacks.picker.git_log_file() end
+end, { desc = "Current File History" })
+map("n", "<leader>gl", function()
+  if is_jj() then Snacks.picker.jj_log() else Snacks.picker.git_log({ cwd = LazyVim.root.git() }) end
+end, { desc = "Log" })
+map({ "n", "x" }, "<leader>gB", function() Snacks.gitbrowse() end, { desc = "Browse (open)" })
 map({"n", "x" }, "<leader>gY", function()
   Snacks.gitbrowse({ open = function(url) vim.fn.setreg("+", url) end, notify = false })
-end, { desc = "Git Browse (copy)" })
+end, { desc = "Browse (copy)" })
 
 -- quit
 map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit All" })
