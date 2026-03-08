@@ -1,14 +1,12 @@
 -- All extras are always enabled in this fork.
 -- Priority determines load order (lower = earlier).
 local prios = {
-  ["lazyvim.plugins.extras.ai.copilot-native"] = 4,
   ["lazyvim.plugins.extras.coding.blink"] = 5,
   ["lazyvim.plugins.extras.lang.typescript"] = 5,
 }
 
 local extras = {
   "lazyvim.plugins.extras.ai.claudecode",
-  "lazyvim.plugins.extras.ai.copilot-native",
   "lazyvim.plugins.extras.coding.blink",
   "lazyvim.plugins.extras.coding.yanky",
   "lazyvim.plugins.extras.editor.dial",
